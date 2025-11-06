@@ -124,7 +124,7 @@ Output (JSON for web, .txt files for S3)
 ## 📁 Git Repository
 
 **Location:** GitLab (private repo)  
-**URL:** `https://gitlab.com/[username]/pdf-chunker` (fill in actual URL)
+**URL:** `https://gitlab.com/destiny-gelatos-0b/pdf-chunker` (fill in actual URL)
 
 **Remote:** HTTPS (not SSH)  
 **Branch:** `main`
@@ -539,7 +539,7 @@ Here's my PROJECT_SUMMARY.md...
 
 **Live Website:** https://my-pdf-chunker-website.s3.us-east-2.amazonaws.com/pdf-chunker.html  
 **Lambda Function URL:** https://6utxwfiwqyll6dtneyd54vcei40xfkmq.lambda-url.us-east-2.on.aws/  
-**GitLab Repo:** [Add your actual URL here]  
+**GitLab Repo:** https://gitlab.com/destiny-gelatos-0b/pdf-chunker
 **CloudWatch Logs:** AWS Console → CloudWatch → /aws/lambda/PDFToTextChunker
 
 ---
