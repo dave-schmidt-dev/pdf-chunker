@@ -1,0 +1,49 @@
+flowchart TD
+    Start([Lambda Invoked]) --> CheckEvent{Event Type?}
+    
+    CheckEvent -->|Has 'Records'| S3Path[S3 Trigger Path]
+    CheckEvent -->|No 'Records'| WebPath[Web Request Path]
+    
+    S3Path --> S3Get[Get PDF from S3]
+    S3Get --> Process[Process PDF]
+    
+    WebPath --> GetIP[Extract IP Address]
+    GetIP --> RateCheck{Rate Limit<br/>Exceeded?}
+    
+    RateCheck -->|Yes| Return429[Return 429 Error]
+    Return429 --> End([End])
+    
+    RateCheck -->|No| UpdateRate[Update Request History]
+    UpdateRate --> DecodeBody[Decode Base64 Body]
+    DecodeBody --> ParseJSON[Parse JSON]
+    ParseJSON --> CheckPDF{PDF Data<br/>Present?}
+    
+    CheckPDF -->|No| Return400[Return 400 Error]
+    Return400 --> End
+    
+    CheckPDF -->|Yes| DecodePDF[Decode Base64 PDF]
+    DecodePDF --> Process
+    
+    Process --> Extract[PyPDF2: Extract Text]
+    Extract --> Clean[Clean Text:<br/>- Remove spaces<br/>- Add breaks<br/>- Format speakers]
+    Clean --> Split[Split into 20k Chunks]
+    
+    Split --> S3Check{Is S3 Trigger?}
+    
+    S3Check -->|Yes| SaveS3[Save Chunks to<br/>Output Bucket]
+    SaveS3 --> Return200S3[Return 200 Success]
+    Return200S3 --> End
+    
+    S3Check -->|No| ReturnJSON[Return JSON with Chunks]
+    ReturnJSON --> End
+    
+    style Start fill:#667eea,color:#fff
+    style End fill:#667eea,color:#fff
+    style Return429 fill:#f8d7da
+    style Return400 fill:#f8d7da
+    style Return200S3 fill:#d4edda
+    style ReturnJSON fill:#d4edda
+    style RateCheck fill:#fff3cd
+    style CheckEvent fill:#cfe2ff
+    style CheckPDF fill:#cfe2ff
+    style S3Check fill:#cfe2ff

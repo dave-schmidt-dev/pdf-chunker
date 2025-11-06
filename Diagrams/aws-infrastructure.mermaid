@@ -1,0 +1,53 @@
+graph LR
+    subgraph "End User"
+        U[👤 User]
+    end
+    
+    subgraph "AWS Region: us-east-2"
+        subgraph "S3 Buckets"
+            S1["📦 my-pdf-chunker-website<br/>(Static Hosting)"]
+            S2["📦 my-pdf-input-bucket-dave<br/>(PDF Storage)"]
+            S3["📦 my-pdf-output-bucket-dave<br/>(Text Output)"]
+        end
+        
+        subgraph "Lambda Service"
+            L1["⚡ PDFToTextChunker<br/>Python 3.13<br/>128 MB RAM<br/>60s timeout"]
+            L2["📚 PyPDF2-Layer<br/>(Lambda Layer)"]
+        end
+        
+        subgraph "IAM"
+            R1["🔐 Lambda Execution Role<br/>S3 Full Access"]
+        end
+        
+        subgraph "Monitoring"
+            CW["📊 CloudWatch Logs<br/>/aws/lambda/PDFToTextChunker"]
+        end
+        
+        subgraph "Networking"
+            FU["🌐 Function URL<br/>CORS Enabled<br/>Auth: NONE"]
+        end
+    end
+    
+    U -->|Access Website| S1
+    S1 -->|Loads HTML/CSS/JS| U
+    U -->|POST PDF| FU
+    FU -->|Invokes| L1
+    L1 -->|Uses| L2
+    L1 -->|Assumes| R1
+    L1 -->|Writes Logs| CW
+    L1 -->|Returns Chunks| FU
+    FU -->|JSON Response| U
+    
+    U -->|Alternative Upload| S2
+    S2 -->|S3 Event Trigger| L1
+    L1 -->|Write .txt files| S3
+    L1 -->|Read PDFs| S2
+    
+    style L1 fill:#FF9900,color:#000
+    style L2 fill:#FF9900,color:#000
+    style S1 fill:#569A31,color:#fff
+    style S2 fill:#569A31,color:#fff
+    style S3 fill:#569A31,color:#fff
+    style CW fill:#FF4F8B,color:#fff
+    style FU fill:#667eea,color:#fff
+    style R1 fill:#DD344C,color:#fff

@@ -1,0 +1,41 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant HTML as pdf-chunker.html
+    participant Lambda as Lambda Function
+    participant PyPDF2 as PyPDF2 Library
+    
+    User->>Browser: Opens website
+    Browser->>HTML: Loads from S3
+    HTML->>Browser: Displays upload interface
+    
+    User->>Browser: Drags PDF file
+    Browser->>HTML: File selected
+    
+    HTML->>HTML: Validate (size, type)
+    HTML->>HTML: Convert to Base64
+    
+    HTML->>Lambda: POST request with Base64 PDF
+    
+    Lambda->>Lambda: Check rate limit
+    
+    alt Rate limit exceeded
+        Lambda->>HTML: 429 Error
+        HTML->>Browser: Show "Rate limit exceeded"
+    else Rate limit OK
+        Lambda->>Lambda: Decode Base64
+        Lambda->>PyPDF2: Extract text from PDF
+        PyPDF2->>Lambda: Raw text
+        
+        Lambda->>Lambda: Clean formatting
+        Lambda->>Lambda: Split into 20k chunks
+        
+        Lambda->>HTML: JSON response with chunks
+        HTML->>Browser: Display chunks
+        
+        User->>Browser: Clicks "Copy to Clipboard"
+        Browser->>User: Chunk copied!
+        
+        User->>Browser: Clicks "Download"
+        Browser->>User: .txt file downloaded
+    end

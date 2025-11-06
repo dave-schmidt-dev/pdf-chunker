@@ -1,0 +1,46 @@
+graph TB
+    subgraph "User Interface"
+        A[Web Browser]
+        B[pdf-chunker.html]
+    end
+    
+    subgraph "AWS Cloud"
+        subgraph "Storage Layer"
+            C[S3 Input Bucket]
+            D[S3 Output Bucket]
+            E[S3 Website Bucket]
+        end
+        
+        subgraph "Compute Layer"
+            F[Lambda Function]
+            G[PyPDF2 Layer]
+        end
+        
+        subgraph "Monitoring"
+            H[CloudWatch Logs]
+        end
+    end
+    
+    subgraph "User"
+        I[User Uploads PDF]
+    end
+    
+    I -->|Drag & Drop| B
+    B -->|Hosted on| E
+    B -->|POST Request<br/>Base64 PDF| F
+    F -->|Uses| G
+    F -->|Logs| H
+    F -->|Returns JSON<br/>Text Chunks| B
+    B -->|Displays Results| A
+    
+    I -->|Alternative:<br/>S3 Upload| C
+    C -->|Triggers| F
+    F -->|Saves .txt files| D
+    
+    style F fill:#ff9900
+    style G fill:#ff9900
+    style C fill:#569A31
+    style D fill:#569A31
+    style E fill:#569A31
+    style H fill:#FF4F8B
+    style B fill:#667eea

@@ -1,0 +1,45 @@
+graph TD
+    subgraph "AWS Free Tier Limits"
+        L1["⚡ Lambda<br/>1M requests/month<br/>400k GB-seconds"]
+        L2["📦 S3 Storage<br/>5 GB storage<br/>20k GET, 2k PUT"]
+        L3["📊 CloudWatch<br/>5 GB logs<br/>10 custom metrics"]
+    end
+    
+    subgraph "Your Typical Usage"
+        U1["📊 ~12 PDFs/month<br/>36 seconds compute<br/>≈ 0.001% of limit"]
+        U2["📦 ~5 MB storage<br/>~24 requests/month<br/>≈ 0.1% of limit"]
+        U3["📊 ~1 MB logs<br/>≈ 0.02% of limit"]
+    end
+    
+    subgraph "With Rate Limiting (10/hour)"
+        R1["🛡️ Max 7,200 PDFs/month<br/>Still within free tier!"]
+        R2["💰 Monthly Cost: $0.00"]
+    end
+    
+    subgraph "Safety Measures"
+        S1["🚨 Billing Alarm @ $5"]
+        S2["⚙️ Concurrency Limit: 10"]
+        S3["🔒 Rate Limiting: 10/hour"]
+    end
+    
+    L1 --> U1
+    L2 --> U2
+    L3 --> U3
+    
+    U1 --> R1
+    U2 --> R1
+    U3 --> R1
+    
+    R1 --> R2
+    
+    S1 --> R2
+    S2 --> R2
+    S3 --> R2
+    
+    style R2 fill:#d4edda,stroke:#28a745,stroke-width:3px
+    style L1 fill:#fff3cd
+    style L2 fill:#fff3cd
+    style L3 fill:#fff3cd
+    style S1 fill:#f8d7da
+    style S2 fill:#f8d7da
+    style S3 fill:#f8d7da
