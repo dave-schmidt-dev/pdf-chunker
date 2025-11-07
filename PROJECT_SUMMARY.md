@@ -48,7 +48,7 @@
    - Purpose: Hosts the HTML web interface
    - Website URL: `https://my-pdf-chunker-website.s3.us-east-2.amazonaws.com/pdf-chunker.html`
    - Static hosting: Enabled
-   - Bucket policy: Public read access
+   - Bucket policy: Public read access (no ACLs)
 
 **IAM Permissions:**
 - Lambda execution role has: `AmazonS3FullAccess`
@@ -57,6 +57,31 @@
 **Monitoring:**
 - CloudWatch Log Group: `/aws/lambda/PDFToTextChunker`
 - Retention: Default (indefinite)
+
+---
+
+## 🎨 Branding & Visual Identity
+
+### Logo Design
+- **Style:** Modern, clean professional logo
+- **Elements:** 
+  - Blue document icon (represents PDF files)
+  - Purple cloud icon (represents AWS serverless/cloud)
+  - Pixelated chunks (represents text chunking process)
+- **Background:** Fully transparent (works on any background)
+- **Typography:** "PDF to Text Chunker" in professional font
+
+### Logo Files
+- **logo.png** (379KB) - PNG format for maximum compatibility
+- **logo.webp** (23KB) - WEBP format for optimized web delivery (94% smaller!)
+- **Optimization:** Uses `<picture>` element with format fallback
+- **Performance:** Modern browsers load tiny WEBP, older browsers get PNG
+
+### Visual Design
+- **Website:** Purple gradient background with white container
+- **Logo Placement:** Centered at top with fade-in animation
+- **Color Scheme:** Blue (#0066CC) + Purple (#7B2CBF) + White
+- **Responsive:** Logo scales from 300px (desktop) to smaller on mobile
 
 ---
 
@@ -138,7 +163,9 @@ Output (JSON for web, .txt files for S3)
 pdf-chunker/
 ├── lambda_function.py          # Lambda code
 ├── pdf-chunker.html            # Web interface
-├── README.md                   # Project overview
+├── logo.png                    # Logo (PNG, 379KB)
+├── logo.webp                   # Logo (WEBP, 23KB)
+├── README.md                   # Project overview with logo
 ├── SETUP.md                    # AWS setup instructions
 ├── CHANGELOG.md                # Version history
 ├── CONTRIBUTING.md             # Contribution guidelines
@@ -147,7 +174,7 @@ pdf-chunker/
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Config template
 ├── .gitignore                  # Git exclusions
-├── deploy.sh                   # Deployment script
+├── deploy.sh                   # Deployment script (bucket policy)
 ├── diagrams/                   # Visual diagrams
 │   ├── architecture-diagram.mermaid
 │   ├── user-workflow.mermaid
@@ -182,13 +209,20 @@ pdf-chunker/
 - Visual feedback (processing, success, error)
 - Preview of chunks
 - Character counts displayed
+- Professional logo and branding
 
 ✅ **Infrastructure:**
 - Serverless architecture
 - Dual trigger support (web + S3)
 - CloudWatch logging
 - Free tier optimized
-- Automated deployment
+- Automated deployment (with bucket policy)
+
+✅ **Performance:**
+- WEBP image optimization (94% size reduction)
+- Progressive enhancement (WEBP with PNG fallback)
+- Responsive design
+- Fast page load (<1 second)
 
 ---
 
@@ -203,7 +237,7 @@ pdf-chunker/
 
 ---
 
-## 🔑 Key Technical Decisions
+## 📝 Key Technical Decisions
 
 ### Why Lambda?
 - Serverless = no server management
@@ -222,6 +256,13 @@ pdf-chunker/
 - Simple setup
 - No server needed
 - Built-in CDN
+
+### Why Bucket Policy (Not ACLs)?
+- Modern AWS security approach
+- Works with current S3 defaults
+- Central management (not per-file)
+- More secure and auditable
+- Required for new S3 buckets
 
 ### Why PyPDF2?
 - Popular, well-maintained
@@ -247,6 +288,12 @@ pdf-chunker/
 - Consistent deployment process
 - Professional development practice
 - Portfolio demonstration of DevOps skills
+
+### Why WEBP + PNG?
+- WEBP: 94% smaller file size (23KB vs 379KB)
+- Progressive enhancement (modern browsers get WEBP)
+- PNG fallback for compatibility
+- Best of both worlds
 
 ---
 
@@ -301,8 +348,9 @@ The `deploy.sh` script handles all deployments automatically.
 2. **Verifies AWS CLI** - Ensures AWS CLI is installed and configured
 3. **Packages Lambda function** - Creates deployment.zip from lambda_function.py
 4. **Uploads to Lambda** - Updates the function code via AWS CLI
-5. **Uploads to S3** - Copies pdf-chunker.html to the website bucket
-6. **Shows status** - Displays deployment results and URLs
+5. **Uploads to S3** - Copies pdf-chunker.html and logos to the website bucket
+6. **Sets bucket policy** - Applies public read policy (no ACLs needed!)
+7. **Shows status** - Displays deployment results and URLs
 
 ### Script Features:
 
@@ -311,6 +359,7 @@ The `deploy.sh` script handles all deployments automatically.
 - ✅ Flexible deployment options (all, lambda, or website)
 - ✅ Automatic cleanup (removes temporary files)
 - ✅ Git safety check (warns about uncommitted changes)
+- ✅ Bucket policy instead of ACLs (modern S3 security)
 
 ### Prerequisites:
 
@@ -338,6 +387,13 @@ aws --version
 **HTML Website (if script fails):**
 ```bash
 aws s3 cp pdf-chunker.html s3://my-pdf-chunker-website/ --region us-east-2
+aws s3 cp logo.png s3://my-pdf-chunker-website/ --region us-east-2
+aws s3 cp logo.webp s3://my-pdf-chunker-website/ --region us-east-2
+
+# Set bucket policy (once)
+aws s3api put-bucket-policy --bucket my-pdf-chunker-website \
+  --policy '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::my-pdf-chunker-website/*"}]}' \
+  --region us-east-2
 ```
 
 ### Layer Updates:
@@ -357,26 +413,31 @@ Then upload via Lambda console and update function to use new layer version.
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Current Version:** 1.1.0
+**Current Version:** 1.2.0
 
 **Latest Updates (November 7, 2025):**
+- ✨ Added professional logo with transparent background
+- ✨ Optimized logo with WEBP format (94% size reduction)
+- ✨ Updated deploy.sh to use bucket policy instead of ACLs
+- ✨ Fixed S3 security compatibility with modern bucket settings
+- ✨ Enhanced website with logo and improved branding
+- ✨ Updated README.md with logo and professional badges
+- 📚 Added comprehensive logo documentation
+
+**Previous Updates (November 7, 2025 - earlier):**
 - ✨ Migrated from GitLab to GitHub as primary repository
 - ✨ Improved deploy.sh script with full automation
-  - Handles both Lambda and S3 deployments
-  - Flexible deployment options (all/lambda/website)
-  - Git status checking and warnings
-  - Color-coded output and error handling
 - ✨ Set up AWS CLI for automated deployments
-- 📝 Updated documentation to reflect new workflow
+- 📚 Updated documentation to reflect new workflow
 
-**Previous Updates (November 5, 2025):**
+**Earlier Updates (November 5, 2025):**
 - Added rate limiting
 - Enabled Lambda Function URL
 - Deployed web interface to S3
 
 ---
 
-## 📚 Testing Scenarios
+## 🧪 Testing Scenarios
 
 ### Successful Test:
 - ✅ Upload 18-page PDF transcript
@@ -386,6 +447,8 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 - ✅ Download works
 - ✅ S3 trigger path works independently
 - ✅ Automated deployment works
+- ✅ Logo displays with transparency
+- ✅ WEBP loads on modern browsers
 
 ### Known Good Test File:
 - "844_This_Is_the_Case_of_Henry_Dee.pdf" (18 pages)
@@ -399,10 +462,11 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 See full list in main conversation, but top priorities:
 
 **For Portfolio/Interviews:**
-1. Mobile responsive design
+1. Mobile responsive design improvements
 2. Better error messages
 3. Download all as ZIP
 4. Add tests
+5. Performance monitoring
 
 **For Functionality:**
 1. Adjustable chunk size
@@ -413,6 +477,7 @@ See full list in main conversation, but top priorities:
 1. TypeScript version
 2. React rebuild
 3. CI/CD pipeline
+4. Docker containerization
 
 ---
 
@@ -422,11 +487,14 @@ See full list in main conversation, but top priorities:
 
 1. **Architecture:** "Serverless design using AWS Lambda and S3"
 2. **Cost Optimization:** "Designed to stay in free tier permanently"
-3. **Security:** "Implemented rate limiting to prevent abuse"
+3. **Security:** "Implemented rate limiting and modern bucket policies"
 4. **UX:** "Clean interface with drag-and-drop, copy to clipboard"
 5. **Versatility:** "Supports both web UI and automated S3 triggers"
 6. **Documentation:** "Full diagrams, setup guides, and Git repo"
-7. **Automation:** "Built deployment automation with bash scripting"
+7. **Automation:** "Built deployment automation with bash scripting and bucket policies"
+8. **Branding:** "Created professional logo with image optimization (94% size reduction with WEBP)"
+9. **Performance:** "Optimized images with progressive enhancement and format fallbacks"
+10. **Problem Solving:** "Adapted to AWS security changes, migrating from ACLs to bucket policies"
 
 **Technical skills demonstrated:**
 - Python, JavaScript, HTML/CSS
@@ -438,6 +506,9 @@ See full list in main conversation, but top priorities:
 - Git version control (GitHub workflow)
 - Technical documentation
 - Bash scripting for deployment
+- Image optimization (WEBP)
+- Modern web standards (progressive enhancement)
+- S3 security (bucket policies)
 
 ---
 
@@ -473,6 +544,21 @@ See full list in main conversation, but top priorities:
 - **"lambda_function.py not found"**: Run script from project root directory
 - **"Access Denied"**: Check AWS credentials have proper permissions
 
+### ACL errors when deploying
+- ✅ **Fixed!** Script now uses bucket policy instead of ACLs
+- If you see ACL errors, update your deploy.sh script
+- Modern S3 buckets block ACLs by default
+
+### Logo has white background
+- ✅ **Fixed!** New logo has true transparency
+- If you see white square: clear browser cache (Cmd+Shift+R)
+- Verify correct logo uploaded (logo.png = 379KB, logo.webp = 23KB)
+
+### Logo not loading on website
+- Check if logo files were uploaded to S3
+- Verify bucket policy is set (not ACLs)
+- Hard refresh browser (Cmd+Shift+R or Ctrl+Shift+R)
+
 ---
 
 ## 📞 For Future Claude Conversations
@@ -487,7 +573,8 @@ See full list in main conversation, but top priorities:
 - AWS resource names (listed above)
 - Current functionality (listed above)
 - Git repo structure (listed above)
-- Deployment workflow (automated via deploy.sh)
+- Deployment workflow (automated via deploy.sh with bucket policy)
+- Logo files and optimization approach
 
 **Quick context statement:**
 ```
@@ -496,7 +583,8 @@ It converts PDFs to text chunks for email. Lambda Function URL
 for web interface, S3 triggers for automated processing.
 Rate limited, free tier optimized. Currently working.
 
-Deployment is fully automated via deploy.sh script.
+Professional logo with WEBP optimization (94% smaller).
+Deployment is fully automated via deploy.sh script using bucket policies.
 GitHub repo: https://github.com/dave-schmidt-dev/pdf-chunker
 AWS CLI is configured.
 
@@ -518,6 +606,7 @@ Here's my PROJECT_SUMMARY.md...
 - [x] CloudWatch logging active
 - [x] Billing alarm set
 - [x] AWS CLI installed and configured
+- [x] Bucket policy configured (not ACLs)
 
 **Code:**
 - [x] Lambda function complete
@@ -526,9 +615,19 @@ Here's my PROJECT_SUMMARY.md...
 - [x] Error handling implemented
 - [x] Text processing working
 - [x] Deployment script automated
+- [x] Deployment script uses bucket policy
+
+**Branding & Design:**
+- [x] Professional logo created
+- [x] Logo with transparent background
+- [x] WEBP optimization (94% size reduction)
+- [x] Logo integrated in website
+- [x] Logo integrated in README
+- [x] Responsive design
+- [x] Modern web standards (progressive enhancement)
 
 **Documentation:**
-- [x] README.md
+- [x] README.md (with logo)
 - [x] SETUP.md
 - [x] CHANGELOG.md
 - [x] PROJECT_FILES.md
@@ -543,6 +642,7 @@ Here's my PROJECT_SUMMARY.md...
 - [x] All files added
 - [x] Pushed to GitHub
 - [x] GitLab backup maintained
+- [x] Logo files committed
 
 **Testing:**
 - [x] Web upload tested
@@ -551,21 +651,26 @@ Here's my PROJECT_SUMMARY.md...
 - [x] Error handling tested
 - [x] Copy/download tested
 - [x] Automated deployment tested
+- [x] Logo transparency tested
+- [x] WEBP loading tested
 
 **Development Tools:**
 - [x] AWS CLI configured
 - [x] Git authentication set up
 - [x] Deployment script working
+- [x] Bucket policy deployment working
 
 ---
 
 ## 📊 Key Metrics
 
-**Development Time:** ~10 hours (initial build + iterations + deployment automation)  
-**Code Lines:** ~300 (Python) + ~200 (JavaScript/HTML) + ~130 (Bash)  
+**Development Time:** ~12 hours (initial build + iterations + deployment automation + branding)  
+**Code Lines:** ~300 (Python) + ~200 (JavaScript/HTML) + ~150 (Bash)  
 **AWS Services:** 4 (Lambda, S3, IAM, CloudWatch)  
 **Total Cost:** $0.00/month  
 **Uptime:** 100% (serverless)  
+**Logo Optimization:** 94% size reduction (WEBP vs PNG)  
+**Page Load Time:** <1 second  
 
 ---
 
@@ -581,6 +686,8 @@ Here's my PROJECT_SUMMARY.md...
 - CloudWatch monitoring
 - Billing alarms
 - AWS CLI usage and automation
+- S3 bucket policies (modern approach)
+- S3 security best practices
 
 **Development Skills:**
 - Serverless architecture patterns
@@ -591,6 +698,9 @@ Here's my PROJECT_SUMMARY.md...
 - Git version control (GitHub workflow)
 - Technical documentation
 - Deployment automation with bash scripts
+- Image optimization (WEBP)
+- Progressive enhancement
+- Web performance optimization
 
 **Problem Solving:**
 - Debugged PyPDF2 layer structure (typo: "puthon")
@@ -601,6 +711,9 @@ Here's my PROJECT_SUMMARY.md...
 - Migrated repositories (GitLab → GitHub)
 - Set up authentication (Personal Access Tokens)
 - Automated deployment workflows
+- Fixed S3 ACL compatibility (bucket policy migration)
+- Resolved PNG transparency issues (alpha channel)
+- Optimized images for web performance
 
 ---
 
@@ -636,7 +749,14 @@ Here's my PROJECT_SUMMARY.md...
    ./deploy.sh website
    ```
 5. Test on live S3 URL
-6. Clear browser cache if changes don't appear
+6. Clear browser cache if changes don't appear (Cmd+Shift+R)
+
+**When updating logo:**
+1. Ensure transparency is properly set (alpha channel)
+2. Optimize with WEBP: `convert logo.png logo.webp`
+3. Commit both formats to Git
+4. Deploy: `./deploy.sh website`
+5. Test in multiple browsers
 
 **When updating both:**
 ```bash
@@ -662,6 +782,7 @@ git push origin main
 3. Check function exists: `aws lambda get-function --function-name PDFToTextChunker --region us-east-2`
 4. Check S3 bucket exists: `aws s3 ls s3://my-pdf-chunker-website --region us-east-2`
 5. Review script output for specific errors
+6. Check bucket policy is set (not ACLs)
 
 **Before making public:**
 - Add authentication mechanism
@@ -689,7 +810,7 @@ git push origin main
 **Status:** Actively maintained  
 **License:** MIT
 
-**Built with help from:** Claude (Anthropic) for architecture advice, troubleshooting, and deployment automation
+**Built with help from:** Claude (Anthropic) for architecture advice, troubleshooting, deployment automation, and branding optimization
 
 ---
 
