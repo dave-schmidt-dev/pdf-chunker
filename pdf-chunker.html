@@ -3,321 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Text Chunks</title>
+    <title>PDF to Text Chunker</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
-        
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .logo-container img {
+            max-width: 300px;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .logo-container h1 {
+            color: white;
+            font-size: 2em;
+            margin-top: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
         .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
-            max-width: 600px;
-            width: 100%;
+            animation: slideUp 0.6s ease-out;
         }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .subtitle {
-            color: #666;
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
             margin-bottom: 30px;
-            font-size: 14px;
         }
-        
+
+        .header h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
         .upload-area {
             border: 3px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px;
+            border-radius: 15px;
+            padding: 60px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             background: #f8f9ff;
+            margin-bottom: 20px;
         }
-        
+
         .upload-area:hover {
             border-color: #764ba2;
             background: #f0f2ff;
+            transform: translateY(-2px);
         }
-        
+
         .upload-area.dragover {
             border-color: #764ba2;
             background: #e8ebff;
             transform: scale(1.02);
         }
-        
+
         .upload-icon {
             font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 1.1em;
             margin-bottom: 10px;
         }
-        
-        input[type="file"] {
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
             display: none;
         }
-        
+
         .status {
-            margin-top: 20px;
+            text-align: center;
+            margin: 20px 0;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-weight: 500;
             display: none;
         }
-        
-        .status.show {
+
+        .status.processing {
+            background: #fff4e6;
+            color: #f59e0b;
+            border: 2px solid #fbbf24;
             display: block;
         }
-        
-        .status.processing {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-        
+
         .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #d1fae5;
+            color: #059669;
+            border: 2px solid #10b981;
+            display: block;
         }
-        
+
         .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fee2e2;
+            color: #dc2626;
+            border: 2px solid #ef4444;
+            display: block;
         }
-        
-        .chunks {
-            margin-top: 20px;
+
+        .results {
+            display: none;
+            margin-top: 30px;
         }
-        
+
+        .results.show {
+            display: block;
+        }
+
         .chunk {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            background: #f8f9ff;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
-        
+
+        .chunk:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
         .chunk-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
         }
-        
+
         .chunk-title {
-            font-weight: bold;
-            color: #495057;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
         }
-        
-        .chunk-size {
-            font-size: 12px;
-            color: #6c757d;
+
+        .chunk-info {
+            color: #666;
+            font-size: 0.9em;
         }
-        
-        .chunk-preview {
-            font-size: 13px;
-            color: #495057;
-            max-height: 100px;
-            overflow: hidden;
-            margin-bottom: 10px;
-            line-height: 1.4;
+
+        .chunk-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
         }
-        
+
+        .chunk-actions {
+            display: flex;
+            gap: 10px;
+        }
+
         .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-copy {
             background: #667eea;
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
         }
-        
-        .btn:hover {
-            background: #764ba2;
+
+        .btn-copy:hover {
+            background: #5568d3;
         }
-        
-        .btn:active {
-            transform: scale(0.98);
+
+        .btn-download {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #059669;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .spinner.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 40px 15px;
+            }
+
+            .chunk-actions {
+                flex-direction: column;
+            }
+
+            .logo-container h1 {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="logo-container">
+        <img src="logo.png" alt="PDF2Text Chunker">
+    </div>
+
     <div class="container">
-        <h1>📄 PDF to Text Chunks</h1>
-        <p class="subtitle">Convert PDFs to email-sized text chunks (20k characters each)</p>
-        
+        <div class="header">
+            <h2>Convert PDF to Text Chunks</h2>
+            <p>Upload your PDF and get it split into 20,000 character chunks</p>
+        </div>
+
         <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📤</div>
-            <p><strong>Drop your PDF here</strong></p>
-            <p style="font-size: 14px; color: #666; margin-top: 10px;">or click to browse</p>
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">Drag and drop your PDF here</div>
+            <div class="upload-hint">or click to browse (max 6MB)</div>
             <input type="file" id="fileInput" accept=".pdf">
         </div>
-        
+
+        <div class="spinner" id="spinner"></div>
+
         <div class="status" id="status"></div>
-        <div class="chunks" id="chunks"></div>
+
+        <div class="results" id="results"></div>
+
+        <div class="footer">
+            <p>Built with AWS Lambda & S3 | <a href="https://github.com/dave-schmidt-dev/pdf-chunker" target="_blank">View on GitHub</a></p>
+        </div>
     </div>
 
     <script>
-        // IMPORTANT: Replace this with YOUR Lambda Function URL
-        const LAMBDA_URL = 'https://6utxwfiwqyll6dtneyd54vcei40xfkmq.lambda-url.us-east-2.on.aws/';
-        
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const status = document.getElementById('status');
-        const chunksDiv = document.getElementById('chunks');
-        
+        const results = document.getElementById('results');
+        const spinner = document.getElementById('spinner');
+        const lambdaUrl = 'https://6utxwfiwqyll6dtneyd54vcei40xfkmq.lambda-url.us-east-2.on.aws/';
+
         // Click to upload
         uploadArea.addEventListener('click', () => fileInput.click());
-        
-        // File selected
+
+        // Drag and drop events
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File input change
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
             }
         });
-        
-        // Drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            if (e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-        
+
         async function handleFile(file) {
-            // Validate file
-            if (!file.name.toLowerCase().endsWith('.pdf')) {
+            if (file.type !== 'application/pdf') {
                 showStatus('error', 'Please upload a PDF file');
                 return;
             }
-            
+
             if (file.size > 6 * 1024 * 1024) {
-                showStatus('error', 'File too large. Maximum size is 6 MB.');
+                showStatus('error', 'File size must be less than 6MB');
                 return;
             }
-            
-            showStatus('processing', `Processing ${file.name}...`);
-            chunksDiv.innerHTML = '';
-            
+
+            showStatus('processing', 'Processing your PDF...');
+            spinner.classList.add('show');
+            results.classList.remove('show');
+
             try {
-                // Read file as binary
-                const arrayBuffer = await file.arrayBuffer();
-                
-                // Convert to base64 (Lambda Function URLs need this)
-                const base64 = btoa(
-                    new Uint8Array(arrayBuffer)
-                        .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                );
-                
-                // Send to Lambda
-                const response = await fetch(LAMBDA_URL, {
+                const base64 = await fileToBase64(file);
+                const response = await fetch(lambdaUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/pdf'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        pdf: base64,
+                        pdf_data: base64,
                         filename: file.name
                     })
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus('success', `✅ Success! Created ${result.num_chunks} text chunks (${result.total_characters.toLocaleString()} characters)`);
-                    displayChunks(result.chunks);
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showStatus('error', data.error);
                 } else {
-                    showStatus('error', `Error: ${result.error}`);
+                    showStatus('success', `Successfully processed! ${data.chunks.length} chunks created`);
+                    displayResults(data);
                 }
-                
             } catch (error) {
                 showStatus('error', `Error: ${error.message}`);
+            } finally {
+                spinner.classList.remove('show');
             }
         }
-        
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         function showStatus(type, message) {
-            status.className = `status show ${type}`;
+            status.className = `status ${type}`;
             status.textContent = message;
         }
-        
-        function displayChunks(chunks) {
-            chunksDiv.innerHTML = '';
+
+        function displayResults(data) {
+            results.innerHTML = '';
             
-            chunks.forEach((chunk, index) => {
+            data.chunks.forEach((chunk, index) => {
                 const chunkDiv = document.createElement('div');
                 chunkDiv.className = 'chunk';
-                
-                const preview = chunk.substring(0, 150) + (chunk.length > 150 ? '...' : '');
-                
                 chunkDiv.innerHTML = `
                     <div class="chunk-header">
-                        <span class="chunk-title">Part ${index + 1}</span>
-                        <span class="chunk-size">${chunk.length.toLocaleString()} characters</span>
+                        <div class="chunk-title">Chunk ${index + 1} of ${data.chunks.length}</div>
+                        <div class="chunk-info">${chunk.character_count.toLocaleString()} characters</div>
                     </div>
-                    <div class="chunk-preview">${preview}</div>
-                    <button class="btn" onclick="copyChunk(${index})">📋 Copy to Clipboard</button>
-                    <button class="btn" onclick="downloadChunk(${index})">💾 Download</button>
+                    <div class="chunk-content">${chunk.text.substring(0, 500)}${chunk.text.length > 500 ? '...' : ''}</div>
+                    <div class="chunk-actions">
+                        <button class="btn btn-copy" onclick="copyToClipboard(${index})">
+                            📋 Copy to Clipboard
+                        </button>
+                        <button class="btn btn-download" onclick="downloadChunk(${index})">
+                            💾 Download
+                        </button>
+                    </div>
                 `;
-                
-                chunksDiv.appendChild(chunkDiv);
+                results.appendChild(chunkDiv);
+            });
+
+            results.classList.add('show');
+            window.chunksData = data.chunks;
+        }
+
+        function copyToClipboard(index) {
+            const text = window.chunksData[index].text;
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('success', 'Copied to clipboard!');
+                setTimeout(() => {
+                    status.classList.remove('success');
+                }, 2000);
+            }).catch(err => {
+                showStatus('error', 'Failed to copy to clipboard');
             });
         }
-        
-        function copyChunk(index) {
-            const chunkText = window.currentChunks[index];
-            
-            navigator.clipboard.writeText(chunkText).then(() => {
-                alert('Copied to clipboard!');
-            });
-        }
-        
+
         function downloadChunk(index) {
-            const chunkText = window.currentChunks[index];
-            const blob = new Blob([chunkText], { type: 'text/plain' });
+            const chunk = window.chunksData[index];
+            const blob = new Blob([chunk.text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `chunk_part${index + 1}.txt`;
+            a.download = `chunk_${index + 1}.txt`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('success', 'Downloaded!');
+            setTimeout(() => {
+                status.classList.remove('success');
+            }, 2000);
         }
-        
-        // Store chunks globally for copy/download functions
-        window.currentChunks = [];
-        
-        const originalDisplayChunks = displayChunks;
-        displayChunks = function(chunks) {
-            window.currentChunks = chunks;
-            originalDisplayChunks(chunks);
-        };
     </script>
 </body>
 </html>
