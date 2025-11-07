@@ -1,7 +1,7 @@
 # PDF to Text Chunker
 
 <div align="center">
-  <img src="logo.png" alt="PDF2Text Chunker Logo" width="400"/>
+  <img src="logo.png" alt="PDF to Text Chunker Logo" width="400"/>
   
   **Convert PDF files into email-friendly text chunks**
   
