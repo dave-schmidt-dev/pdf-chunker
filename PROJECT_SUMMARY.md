@@ -1,6 +1,6 @@
 # PDF to Text Chunks - Project Summary
 
-**Last Updated:** November 6, 2025  
+**Last Updated:** November 7, 2025  
 **Status:** ✅ Fully Functional  
 **Cost:** $0/month (AWS Free Tier)
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 🏗️ Current Architecture
+## 🗂️ Current Architecture
 
 ### AWS Resources (Region: us-east-2)
 
@@ -123,11 +123,15 @@ Output (JSON for web, .txt files for S3)
 
 ## 📁 Git Repository
 
-**Location:** GitLab (private repo)  
-**URL:** `https://gitlab.com/destiny-gelatos-0b/pdf-chunker` (fill in actual URL)
+**Primary Location:** GitHub (public repo)  
+**URL:** https://github.com/dave-schmidt-dev/pdf-chunker
+
+**Backup:** GitLab (https://gitlab.com/destiny-gelatos-0b/pdf-chunker)
 
 **Remote:** HTTPS (not SSH)  
 **Branch:** `main`
+
+**Authentication:** Personal Access Token (configured in AWS CLI and Git)
 
 ### Repository Structure:
 ```
@@ -184,10 +188,11 @@ pdf-chunker/
 - Dual trigger support (web + S3)
 - CloudWatch logging
 - Free tier optimized
+- Automated deployment
 
 ---
 
-## 🐛 Known Limitations
+## 🛠 Known Limitations
 
 1. **File Size:** 6 MB limit (Lambda Function URL payload limit)
 2. **OCR:** Cannot extract text from scanned PDFs (images)
@@ -236,9 +241,16 @@ pdf-chunker/
 - Simple implementation
 - Good enough without database
 
+### Why Automated Deployment?
+- Eliminates manual errors
+- Faster iteration cycle
+- Consistent deployment process
+- Professional development practice
+- Portfolio demonstration of DevOps skills
+
 ---
 
-## 📝 Configuration Details
+## 📊 Configuration Details
 
 ### Environment Variables (for reference, not used in Lambda):
 ```
@@ -264,42 +276,100 @@ MAX_PDF_SIZE_MB=6
 
 ## 🚀 Deployment Process
 
-### Lambda Function:
-**Option 1: Manual (current method)**
-1. Go to Lambda console
-2. Paste code into editor
-3. Click "Deploy"
+### Automated Deployment (Recommended)
 
-**Option 2: Automated (script available)**
+The `deploy.sh` script handles all deployments automatically.
+
+**Deploy everything (Lambda + Website):**
 ```bash
 ./deploy.sh
 ```
 
-### HTML Website:
-1. Edit `pdf-chunker.html` locally
-2. Go to S3 → `my-pdf-chunker-website` bucket
-3. Upload file (overwrites existing)
+**Deploy only Lambda function:**
+```bash
+./deploy.sh lambda
+```
+
+**Deploy only HTML website:**
+```bash
+./deploy.sh website
+```
+
+### What the Script Does:
+
+1. **Checks for uncommitted changes** - Warns if you have unsaved Git changes
+2. **Verifies AWS CLI** - Ensures AWS CLI is installed and configured
+3. **Packages Lambda function** - Creates deployment.zip from lambda_function.py
+4. **Uploads to Lambda** - Updates the function code via AWS CLI
+5. **Uploads to S3** - Copies pdf-chunker.html to the website bucket
+6. **Shows status** - Displays deployment results and URLs
+
+### Script Features:
+
+- ✅ Color-coded output (green = success, red = error, yellow = warning)
+- ✅ Error handling (exits on failure)
+- ✅ Flexible deployment options (all, lambda, or website)
+- ✅ Automatic cleanup (removes temporary files)
+- ✅ Git safety check (warns about uncommitted changes)
+
+### Prerequisites:
+
+**AWS CLI must be installed and configured:**
+```bash
+# Install AWS CLI (macOS)
+curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+sudo installer -pkg AWSCLIV2.pkg -target /
+
+# Configure with credentials
+aws configure
+# Enter: Access Key ID, Secret Access Key, Region (us-east-2), Output format (json)
+
+# Verify installation
+aws --version
+```
+
+### Manual Deployment (Not Recommended)
+
+**Lambda Function (if script fails):**
+1. Go to Lambda console
+2. Paste code into editor
+3. Click "Deploy"
+
+**HTML Website (if script fails):**
+```bash
+aws s3 cp pdf-chunker.html s3://my-pdf-chunker-website/ --region us-east-2
+```
 
 ### Layer Updates:
-1. Recreate layer locally:
+
+If you need to update the PyPDF2 layer:
 ```bash
 mkdir -p lambda-layer/python/lib/python3.13/site-packages
 pip3 install PyPDF2 -t lambda-layer/python/lib/python3.13/site-packages/
 cd lambda-layer
 zip -r pypdf2-layer.zip python
 ```
-2. Upload to Lambda Layers
-3. Update function to use new layer version
+Then upload via Lambda console and update function to use new layer version.
 
 ---
 
-## 🔄 Recent Changes
+## 📄 Recent Changes
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Current Version:** 1.0.0 (Initial Release)
+**Current Version:** 1.1.0
 
-**Last significant change:** November 5, 2025
+**Latest Updates (November 7, 2025):**
+- ✨ Migrated from GitLab to GitHub as primary repository
+- ✨ Improved deploy.sh script with full automation
+  - Handles both Lambda and S3 deployments
+  - Flexible deployment options (all/lambda/website)
+  - Git status checking and warnings
+  - Color-coded output and error handling
+- ✨ Set up AWS CLI for automated deployments
+- 📝 Updated documentation to reflect new workflow
+
+**Previous Updates (November 5, 2025):**
 - Added rate limiting
 - Enabled Lambda Function URL
 - Deployed web interface to S3
@@ -315,6 +385,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 - ✅ Copy to clipboard works
 - ✅ Download works
 - ✅ S3 trigger path works independently
+- ✅ Automated deployment works
 
 ### Known Good Test File:
 - "844_This_Is_the_Case_of_Henry_Dee.pdf" (18 pages)
@@ -355,15 +426,18 @@ See full list in main conversation, but top priorities:
 4. **UX:** "Clean interface with drag-and-drop, copy to clipboard"
 5. **Versatility:** "Supports both web UI and automated S3 triggers"
 6. **Documentation:** "Full diagrams, setup guides, and Git repo"
+7. **Automation:** "Built deployment automation with bash scripting"
 
 **Technical skills demonstrated:**
 - Python, JavaScript, HTML/CSS
 - AWS (Lambda, S3, IAM, CloudWatch)
+- AWS CLI and automation
 - Serverless architecture
 - API design (Function URLs)
 - Text processing algorithms
-- Git version control
+- Git version control (GitHub workflow)
 - Technical documentation
+- Bash scripting for deployment
 
 ---
 
@@ -387,10 +461,17 @@ See full list in main conversation, but top priorities:
 - Verify file ends in `.pdf` (lowercase)
 - Check CloudWatch logs for errors
 
-### Can't push to GitLab
+### Can't push to GitHub
 - Using HTTPS remote (not SSH)
 - Need Personal Access Token (not password)
-- Check: `git remote -v` shows HTTPS URL
+- Check: `git remote -v` shows correct URL
+- Verify token is saved: Git should not ask for password repeatedly
+
+### Deployment script errors
+- **"AWS CLI not found"**: Install AWS CLI (see deployment section)
+- **"Unable to locate credentials"**: Run `aws configure`
+- **"lambda_function.py not found"**: Run script from project root directory
+- **"Access Denied"**: Check AWS credentials have proper permissions
 
 ---
 
@@ -406,6 +487,7 @@ See full list in main conversation, but top priorities:
 - AWS resource names (listed above)
 - Current functionality (listed above)
 - Git repo structure (listed above)
+- Deployment workflow (automated via deploy.sh)
 
 **Quick context statement:**
 ```
@@ -413,6 +495,11 @@ I have a serverless PDF processing app using AWS Lambda and S3.
 It converts PDFs to text chunks for email. Lambda Function URL
 for web interface, S3 triggers for automated processing.
 Rate limited, free tier optimized. Currently working.
+
+Deployment is fully automated via deploy.sh script.
+GitHub repo: https://github.com/dave-schmidt-dev/pdf-chunker
+AWS CLI is configured.
+
 Here's my PROJECT_SUMMARY.md...
 ```
 
@@ -430,6 +517,7 @@ Here's my PROJECT_SUMMARY.md...
 - [x] IAM permissions set
 - [x] CloudWatch logging active
 - [x] Billing alarm set
+- [x] AWS CLI installed and configured
 
 **Code:**
 - [x] Lambda function complete
@@ -437,6 +525,7 @@ Here's my PROJECT_SUMMARY.md...
 - [x] Rate limiting implemented
 - [x] Error handling implemented
 - [x] Text processing working
+- [x] Deployment script automated
 
 **Documentation:**
 - [x] README.md
@@ -449,10 +538,11 @@ Here's my PROJECT_SUMMARY.md...
 - [x] .gitignore
 
 **Git:**
-- [x] Repository created
+- [x] Repository created on GitHub
 - [x] Initial commit done
 - [x] All files added
-- [x] Pushed to GitLab
+- [x] Pushed to GitHub
+- [x] GitLab backup maintained
 
 **Testing:**
 - [x] Web upload tested
@@ -460,13 +550,19 @@ Here's my PROJECT_SUMMARY.md...
 - [x] Rate limiting tested
 - [x] Error handling tested
 - [x] Copy/download tested
+- [x] Automated deployment tested
+
+**Development Tools:**
+- [x] AWS CLI configured
+- [x] Git authentication set up
+- [x] Deployment script working
 
 ---
 
 ## 📊 Key Metrics
 
-**Development Time:** ~8 hours (initial build + iterations)  
-**Code Lines:** ~300 (Python) + ~200 (JavaScript/HTML)  
+**Development Time:** ~10 hours (initial build + iterations + deployment automation)  
+**Code Lines:** ~300 (Python) + ~200 (JavaScript/HTML) + ~130 (Bash)  
 **AWS Services:** 4 (Lambda, S3, IAM, CloudWatch)  
 **Total Cost:** $0.00/month  
 **Uptime:** 100% (serverless)  
@@ -484,6 +580,7 @@ Here's my PROJECT_SUMMARY.md...
 - IAM roles and permissions
 - CloudWatch monitoring
 - Billing alarms
+- AWS CLI usage and automation
 
 **Development Skills:**
 - Serverless architecture patterns
@@ -491,8 +588,9 @@ Here's my PROJECT_SUMMARY.md...
 - CORS configuration
 - Rate limiting strategies
 - Text processing algorithms
-- Git version control
+- Git version control (GitHub workflow)
 - Technical documentation
+- Deployment automation with bash scripts
 
 **Problem Solving:**
 - Debugged PyPDF2 layer structure (typo: "puthon")
@@ -500,32 +598,70 @@ Here's my PROJECT_SUMMARY.md...
 - Resolved base64 double-encoding
 - Implemented rate limiting without database
 - URL encoding issues with special characters
+- Migrated repositories (GitLab → GitHub)
+- Set up authentication (Personal Access Tokens)
+- Automated deployment workflows
 
 ---
 
 ## 📝 Notes for Future Maintenance
 
 **When updating Lambda code:**
-1. Test locally if possible
-2. Update in AWS console
-3. Click Deploy
-4. Test with actual PDF
-5. Check CloudWatch logs
-6. Update local Git files
-7. Commit and push
+1. Edit `lambda_function.py` locally
+2. Test locally if possible
+3. Commit to Git:
+   ```bash
+   git add lambda_function.py
+   git commit -m "Description of changes"
+   git push origin main
+   ```
+4. Deploy to AWS:
+   ```bash
+   ./deploy.sh lambda
+   ```
+5. Test with actual PDF via the website
+6. Check CloudWatch logs if issues
 
 **When updating website:**
-1. Edit local HTML file
+1. Edit `pdf-chunker.html` locally
 2. Test locally (open in browser)
-3. Upload to S3 (overwrites)
-4. Test on actual S3 URL
-5. Commit to Git
+3. Commit to Git:
+   ```bash
+   git add pdf-chunker.html
+   git commit -m "Description of changes"
+   git push origin main
+   ```
+4. Deploy to S3:
+   ```bash
+   ./deploy.sh website
+   ```
+5. Test on live S3 URL
+6. Clear browser cache if changes don't appear
+
+**When updating both:**
+```bash
+# After making changes and testing
+git add .
+git commit -m "Description of changes"
+git push origin main
+./deploy.sh  # Deploys everything
+```
+
+**Important workflow rule:**
+> Always commit to Git BEFORE deploying to AWS. Git is your source of truth.
 
 **When costs change:**
 1. Check CloudWatch billing metrics
 2. Review CloudWatch logs for unusual activity
 3. Verify rate limiting is working
 4. Check S3 bucket sizes
+
+**If deployment fails:**
+1. Check AWS CLI is configured: `aws configure list`
+2. Verify credentials: `aws sts get-caller-identity`
+3. Check function exists: `aws lambda get-function --function-name PDFToTextChunker --region us-east-2`
+4. Check S3 bucket exists: `aws s3 ls s3://my-pdf-chunker-website --region us-east-2`
+5. Review script output for specific errors
 
 **Before making public:**
 - Add authentication mechanism
@@ -539,7 +675,8 @@ Here's my PROJECT_SUMMARY.md...
 
 **Live Website:** https://my-pdf-chunker-website.s3.us-east-2.amazonaws.com/pdf-chunker.html  
 **Lambda Function URL:** https://6utxwfiwqyll6dtneyd54vcei40xfkmq.lambda-url.us-east-2.on.aws/  
-**GitLab Repo:** https://gitlab.com/destiny-gelatos-0b/pdf-chunker
+**GitHub Repo:** https://github.com/dave-schmidt-dev/pdf-chunker  
+**GitLab Backup:** https://gitlab.com/destiny-gelatos-0b/pdf-chunker  
 **CloudWatch Logs:** AWS Console → CloudWatch → /aws/lambda/PDFToTextChunker
 
 ---
@@ -547,13 +684,14 @@ Here's my PROJECT_SUMMARY.md...
 ## 👤 Contact & Credits
 
 **Developer:** David Schmidt  
+**GitHub:** https://github.com/dave-schmidt-dev  
 **Purpose:** Personal tool + portfolio project  
 **Status:** Actively maintained  
 **License:** MIT
 
-**Built with help from:** Claude (Anthropic) for architecture advice and troubleshooting
+**Built with help from:** Claude (Anthropic) for architecture advice, troubleshooting, and deployment automation
 
 ---
 
-**Last Updated:** November 6, 2025  
+**Last Updated:** November 7, 2025  
 **Next Review:** When adding new features or if issues arise
