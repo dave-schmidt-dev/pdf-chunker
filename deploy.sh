@@ -1,116 +1,154 @@
 #!/bin/bash
-# Complete Deployment Script for PDF Chunker Project
-# Deploys both Lambda function and HTML website
+
+# deploy.sh - Automated deployment script for PDF Chunker
 # Usage: ./deploy.sh [lambda|website|all]
+# - lambda: Deploy only Lambda function
+# - website: Deploy only website files
+# - all or no argument: Deploy everything
 
 set -e  # Exit on error
 
-# Configuration
-FUNCTION_NAME="PDFToTextChunker"
-REGION="us-east-2"
-S3_WEBSITE_BUCKET="my-pdf-chunker-website"
-HTML_FILE="pdf-chunker.html"
-
 # Colors for output
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 RED='\033[0;31m'
+YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Default to deploying everything
-DEPLOY_TARGET="${1:-all}"
+# Configuration
+LAMBDA_FUNCTION="PDFToTextChunker"
+WEBSITE_BUCKET="my-pdf-chunker-website"
+REGION="us-east-2"
 
-# Functions
-deploy_lambda() {
-    echo -e "${BLUE}📦 Deploying Lambda Function...${NC}"
-    
-    # Check if function file exists
-    if [ ! -f "lambda_function.py" ]; then
-        echo -e "${RED}❌ lambda_function.py not found!${NC}"
-        return 1
-    fi
-    
-    echo "  → Creating deployment package..."
-    zip -q deployment.zip lambda_function.py
-    
-    echo "  → Uploading to AWS Lambda..."
-    aws lambda update-function-code \
-        --function-name $FUNCTION_NAME \
-        --zip-file fileb://deployment.zip \
-        --region $REGION > /dev/null
-    
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}  ✅ Lambda deployed successfully!${NC}"
-    else
-        echo -e "${RED}  ❌ Lambda deployment failed!${NC}"
-        return 1
-    fi
-    
-    # Cleanup
-    rm deployment.zip
-}
+# Determine what to deploy
+DEPLOY_MODE="${1:-all}"
 
-deploy_website() {
-    echo -e "${BLUE}🌐 Deploying Website...${NC}"
-    
-    # Check if HTML file exists
-    if [ ! -f "$HTML_FILE" ]; then
-        echo -e "${RED}❌ $HTML_FILE not found!${NC}"
-        return 1
-    fi
-    
-    # In the website deployment section, add:
-    echo "Uploading website files to S3..."
-    aws s3 cp pdf-chunker.html s3://$S3_WEBSITE_BUCKET/ --region us-east-2
-    aws s3 cp logo.png s3://$S3_WEBSITE_BUCKET/ --region us-east-2
-    aws s3api put-object-acl --bucket $S3_WEBSITE_BUCKET --key logo.png --acl public-read --region us-east-2
-    
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}  ✅ Website deployed successfully!${NC}"
-        echo -e "  🔗 URL: https://$S3_WEBSITE_BUCKET.s3.$REGION.amazonaws.com/$HTML_FILE"
-    else
-        echo -e "${RED}  ❌ Website deployment failed!${NC}"
-        return 1
-    fi
-}
-
-show_status() {
-    echo ""
-    echo -e "${BLUE}📊 Deployment Status:${NC}"
-    echo "  Function: $FUNCTION_NAME"
-    echo "  Region: $REGION"
-    echo "  Website: https://$S3_WEBSITE_BUCKET.s3.$REGION.amazonaws.com/$HTML_FILE"
-}
-
-# Main deployment logic
-echo -e "${YELLOW}🚀 PDF Chunker Deployment Tool${NC}"
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}  PDF Chunker Deployment Script${NC}"
+echo -e "${BLUE}========================================${NC}"
 echo ""
+
+# Check for uncommitted changes
+if [[ $(git status --porcelain) ]]; then
+    echo -e "${YELLOW}⚠️  Warning: You have uncommitted changes${NC}"
+    echo -e "${YELLOW}   Consider committing before deploying${NC}"
+    echo ""
+fi
 
 # Check if AWS CLI is installed
 if ! command -v aws &> /dev/null; then
-    echo -e "${RED}❌ AWS CLI not found. Please install it first.${NC}"
-    echo "Install: https://aws.amazon.com/cli/"
+    echo -e "${RED}❌ Error: AWS CLI is not installed${NC}"
+    echo -e "${YELLOW}   Install it from: https://aws.amazon.com/cli/${NC}"
     exit 1
 fi
 
-# Check git status
-if [ -n "$(git status --porcelain)" ]; then
-    echo -e "${YELLOW}⚠️  Warning: You have uncommitted changes!${NC}"
-    echo "Consider committing to Git first:"
-    echo "  git add ."
-    echo "  git commit -m 'Your message'"
-    echo "  git push origin main"
-    echo ""
-    read -p "Continue anyway? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
+# Verify AWS credentials are configured
+if ! aws sts get-caller-identity &> /dev/null; then
+    echo -e "${RED}❌ Error: AWS credentials not configured${NC}"
+    echo -e "${YELLOW}   Run: aws configure${NC}"
+    exit 1
 fi
 
-# Deploy based on target
-case $DEPLOY_TARGET in
+echo -e "${GREEN}✓ AWS CLI configured${NC}"
+echo ""
+
+# Function to deploy Lambda
+deploy_lambda() {
+    echo -e "${BLUE}Deploying Lambda function...${NC}"
+    
+    # Check if lambda_function.py exists
+    if [ ! -f "lambda_function.py" ]; then
+        echo -e "${RED}❌ Error: lambda_function.py not found${NC}"
+        echo -e "${YELLOW}   Make sure you're in the project root directory${NC}"
+        exit 1
+    fi
+    
+    # Create deployment package
+    echo "📦 Creating deployment package..."
+    zip -q deployment.zip lambda_function.py
+    
+    # Upload to Lambda
+    echo "⬆️  Uploading to Lambda..."
+    aws lambda update-function-code \
+        --function-name $LAMBDA_FUNCTION \
+        --zip-file fileb://deployment.zip \
+        --region $REGION \
+        > /dev/null
+    
+    # Clean up
+    rm deployment.zip
+    
+    echo -e "${GREEN}✅ Lambda function deployed successfully!${NC}"
+    echo ""
+}
+
+# Function to deploy website
+deploy_website() {
+    echo -e "${BLUE}Deploying website files...${NC}"
+    
+    # Check if files exist
+    if [ ! -f "pdf-chunker.html" ]; then
+        echo -e "${RED}❌ Error: pdf-chunker.html not found${NC}"
+        exit 1
+    fi
+    
+    # Upload HTML file
+    echo "⬆️  Uploading pdf-chunker.html..."
+    aws s3 cp pdf-chunker.html s3://$WEBSITE_BUCKET/ \
+        --region $REGION \
+        --quiet
+    
+    # Upload logo files if they exist
+    if [ -f "logo.png" ]; then
+        echo "⬆️  Uploading logo.png..."
+        aws s3 cp logo.png s3://$WEBSITE_BUCKET/ \
+            --region $REGION \
+            --quiet
+    fi
+    
+    if [ -f "logo.webp" ]; then
+        echo "⬆️  Uploading logo.webp..."
+        aws s3 cp logo.webp s3://$WEBSITE_BUCKET/ \
+            --region $REGION \
+            --quiet
+    fi
+    
+    # Set bucket policy for public access (replaces ACLs)
+    echo "🔐 Setting bucket policy for public access..."
+    
+    # Create temporary policy file
+    cat > /tmp/bucket-policy.json << EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::$WEBSITE_BUCKET/*"
+    }
+  ]
+}
+EOF
+    
+    # Apply bucket policy
+    aws s3api put-bucket-policy \
+        --bucket $WEBSITE_BUCKET \
+        --policy file:///tmp/bucket-policy.json \
+        --region $REGION \
+        2>/dev/null || echo -e "${YELLOW}   Note: Bucket policy already set or unable to update${NC}"
+    
+    # Clean up
+    rm /tmp/bucket-policy.json
+    
+    echo -e "${GREEN}✅ Website deployed successfully!${NC}"
+    echo -e "${GREEN}🌐 URL: https://$WEBSITE_BUCKET.s3.$REGION.amazonaws.com/pdf-chunker.html${NC}"
+    echo ""
+}
+
+# Deploy based on mode
+case $DEPLOY_MODE in
     lambda)
         deploy_lambda
         ;;
@@ -119,16 +157,21 @@ case $DEPLOY_TARGET in
         ;;
     all)
         deploy_lambda
-        echo ""
         deploy_website
         ;;
     *)
-        echo -e "${RED}❌ Invalid target: $DEPLOY_TARGET${NC}"
-        echo "Usage: $0 [lambda|website|all]"
+        echo -e "${RED}❌ Error: Invalid argument '$DEPLOY_MODE'${NC}"
+        echo -e "${YELLOW}Usage: ./deploy.sh [lambda|website|all]${NC}"
         exit 1
         ;;
 esac
 
-show_status
+echo -e "${BLUE}========================================${NC}"
+echo -e "${GREEN}✅ Deployment complete!${NC}"
+echo -e "${BLUE}========================================${NC}"
 echo ""
-echo -e "${GREEN}✨ Deployment complete!${NC}"
+echo -e "${YELLOW}Next steps:${NC}"
+echo "  • Test Lambda: Upload a PDF via the website"
+echo "  • Check CloudWatch logs if there are issues"
+echo "  • View website: https://$WEBSITE_BUCKET.s3.$REGION.amazonaws.com/pdf-chunker.html"
+echo ""
