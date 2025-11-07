@@ -60,9 +60,11 @@ deploy_website() {
         return 1
     fi
     
-    echo "  → Uploading to S3..."
-    aws s3 cp $HTML_FILE s3://$S3_WEBSITE_BUCKET/ \
-        --region $REGION > /dev/null
+    # In the website deployment section, add:
+    echo "Uploading website files to S3..."
+    aws s3 cp pdf-chunker.html s3://$WEBSITE_BUCKET/ --region us-east-2
+    aws s3 cp logo.png s3://$WEBSITE_BUCKET/ --region us-east-2
+    aws s3api put-object-acl --bucket $WEBSITE_BUCKET --key logo.png --acl public-read --region us-east-2
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}  ✅ Website deployed successfully!${NC}"
