@@ -150,22 +150,22 @@ Built with assistance from Claude (Anthropic) for architecture design, troublesh
 **Developer:** David Schmidt  
 **GitHub:** [@dave-schmidt-dev](https://github.com/dave-schmidt-dev)
 
-##📁 Repository Files
+## 📁 Repository Files
 Complete index of all files in this repository with direct access links:
 
-###📄 Documentation
+### 📄 Documentation
 FileDescriptionDirect LinkREADME.mdProject overview and quick startViewSETUP.mdComplete AWS setup guideViewPROJECT_SUMMARY.mdComprehensive project documentationViewPROJECT_FILES.mdFile-by-file documentationViewCHANGELOG.mdVersion history and updatesViewCONTRIBUTING.mdContribution guidelinesViewLICENSEMIT LicenseView
 
-###💻 Source Code
+### 💻 Source Code
 FileDescriptionDirect Linklambda_function.pyAWS Lambda function (Python 3.13)Viewpdf-chunker.htmlWeb interface (HTML/CSS/JS)Viewdeploy.shAutomated deployment scriptView
 
-###⚙️ Configuration Files
+### ⚙️ Configuration Files
 FileDescriptionDirect Linkrequirements.txtPython dependenciesView.env.exampleEnvironment variable templateView.gitignoreGit exclusionsView
 
-###🎨 Assets
+### 🎨 Assets
 FileDescriptionDirect Linklogo.pngProject logo (PNG, 379KB)Viewlogo.webpOptimized logo (WEBP, 23KB)View
 
-###📊 Diagrams
+### 📊 Diagrams
 All architectural diagrams and visualizations:
 FileDescriptionDirect LinkDIAGRAMS.mdDiagram documentationViewarchitecture-diagram.mermaidSystem architectureViewaws-infrastructure.mermaidAWS resources layoutViewcode-logic.mermaidProcessing logic flowViewcost-breakdown.mermaidCost analysisViewdata-flow.mermaidData flow diagramViewuser-workflow.mermaidUser interaction flowViewproject-illustration.svgProject illustrationView
 
