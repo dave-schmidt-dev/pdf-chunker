@@ -161,6 +161,7 @@ Complete index of all files in this repository with direct access links. All lin
 | File | Description | Direct Link |
 |------|-------------|-------------|
 | README.md | Project overview and quick start | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/README.md) |
+| PROJECT_INSTRUCTIONS.md | AI assistant context and workflow | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/PROJECT_INSTRUCTIONS.md) |
 | SETUP.md | Complete AWS setup guide | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/SETUP.md) |
 | PROJECT_SUMMARY.md | Comprehensive project documentation | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/PROJECT_SUMMARY.md) |
 | PROJECT_FILES.md | File-by-file documentation | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/PROJECT_FILES.md) |

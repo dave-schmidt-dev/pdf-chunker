@@ -1,6 +1,6 @@
 # PDF to Text Chunks - Project Summary
 
-**Last Updated:** November 7, 2025  
+**Last Updated:** November 9, 2025  
 **Status:** ✅ Fully Functional  
 **Cost:** $0/month (AWS Free Tier)
 
@@ -166,6 +166,7 @@ pdf-chunker/
 ├── logo.png                    # Logo (PNG, 379KB)
 ├── logo.webp                   # Logo (WEBP, 23KB)
 ├── README.md                   # Project overview with logo
+|── PROJECT_INSTRUCTIONS.md     # AI assistant context (NEW)
 ├── SETUP.md                    # AWS setup instructions
 ├── CHANGELOG.md                # Version history
 ├── CONTRIBUTING.md             # Contribution guidelines
@@ -588,7 +589,9 @@ Deployment is fully automated via deploy.sh script using bucket policies.
 GitHub repo: https://github.com/dave-schmidt-dev/pdf-chunker
 AWS CLI is configured.
 
-Here's my PROJECT_SUMMARY.md...
+For complete project context:
+- README (raw): https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/README.md
+- Full Instructions: https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/PROJECT_INSTRUCTIONS.md
 ```
 
 ---

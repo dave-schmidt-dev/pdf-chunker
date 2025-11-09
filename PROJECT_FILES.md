@@ -54,6 +54,13 @@ Complete list of files for the PDF to Text Chunks project and their purposes.
 **AWS:** ❌ NO - Only for Git
 **Notes:** Critical for portfolio/job applications
 
+### `PROJECT_INSTRUCTIONS.md` ⭐ IMPORTANT
+**What:** Comprehensive AI assistant context file
+**Why:** Provides complete project background for AI-assisted development
+**Git:** ✅ YES - Commit this
+**AWS:** ❌ NO - Reference only
+**Notes:** Contains technical stack, development principles, workflow instructions, and interview talking points. Use at start of AI work sessions and when onboarding collaborators. Update after major features, deployment changes, or architectural decisions.
+
 ### `SETUP.md`
 **What:** AWS setup instructions
 **Why:** Helps others (or future you) recreate the project
@@ -148,6 +155,7 @@ pdf-chunker/
 ├── lambda_function.py          # ⭐ Lambda code
 ├── pdf-chunker.html            # ⭐ Web interface
 ├── README.md                   # ⭐ Project overview
+├── PROJECT_INSTRUCTIONS.md     # ⭐ AI assistant context
 ├── SETUP.md                    # AWS setup guide
 ├── CHANGELOG.md                # Change history
 ├── CONTRIBUTING.md             # Contribution guide

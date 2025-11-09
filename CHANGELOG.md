@@ -5,6 +5,28 @@ All notable changes to the PDF to Text Chunker project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-11-09
+
+### Added
+- **PROJECT_INSTRUCTIONS.md** - Comprehensive AI assistant context file with complete project background, technical stack, development principles, and workflow instructions
+- **Automated file access workflow** - README now includes explicit raw.githubusercontent.com URLs for all repository files, enabling AI assistants to automatically access any file without manual linking
+- **Simplified project instructions** - Created CLAUDE_PROJECT_INSTRUCTIONS.txt for use in Claude Project settings
+
+### Changed
+- **README.md** - Repository Files section now uses explicit raw file URLs instead of generic "View" links, enabling automated tool access
+- **README.md** - Added PROJECT_INSTRUCTIONS.md to Documentation table
+- **Project workflow** - New conversation start process: provide README raw link, AI assistant can then access all files automatically
+
+### Documentation
+- AI assistants can now access entire repo by fetching README and following embedded links
+- Established template for future projects with same workflow
+- Updated documentation reflects modern approach to AI-assisted development
+
+### Technical
+- All file links point to raw.githubusercontent.com for direct content access
+- Note added about cache delays when updating files
+- Workflow designed around web_fetch tool capabilities and limitations
+
 ## [1.2.0] - 2025-11-07
 
 ### Added
