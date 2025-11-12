@@ -68,3 +68,10 @@ credentials.json
 .AppleDouble
 .LSOverride
 AWSCLIV2.pkg
+
+# Standard ignores (auto-added)
+.dev/
+.venv/
+*.pyc
+node_modules/
+.next/
