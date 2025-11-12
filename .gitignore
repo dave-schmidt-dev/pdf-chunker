@@ -70,7 +70,6 @@ credentials.json
 AWSCLIV2.pkg
 
 # Standard ignores (auto-added)
-.dev/
 .venv/
 *.pyc
 node_modules/
