@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,10 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #111827;
+            /* Dark background */
+            color: #d1d5db;
+            /* Light gray text */
             min-height: 100vh;
             padding: 20px;
         }
@@ -27,22 +31,27 @@
         .logo-container img {
             max-width: 300px;
             height: auto;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            /* Add a slight glow for dark mode */
+            filter: drop-shadow(0 0 15px rgba(118, 75, 162, 0.3));
         }
 
         .logo-container h1 {
-            color: white;
+            color: #f3f4f6;
             font-size: 2em;
             margin-top: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background-color: #1f2937;
+            /* Darker card background */
+            border: 1px solid #374151;
+            /* Subtle border */
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            /* Darker shadow */
             padding: 40px;
             animation: slideUp 0.6s ease-out;
         }
@@ -52,6 +61,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -63,6 +73,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -75,53 +86,57 @@
         }
 
         .header h2 {
-            color: #333;
+            color: #f9fafb;
+            /* Almost white */
             font-size: 1.5em;
             margin-bottom: 10px;
         }
 
         .header p {
-            color: #666;
+            color: #9ca3af;
+            /* Muted gray */
             font-size: 0.95em;
         }
 
         .upload-area {
-            border: 3px dashed #667eea;
+            border: 2px dashed #4b5563;
             border-radius: 15px;
             padding: 60px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f8f9ff;
+            background: #111827;
+            /* Very dark inside upload area */
             margin-bottom: 20px;
         }
 
         .upload-area:hover {
-            border-color: #764ba2;
-            background: #f0f2ff;
+            border-color: #818cf8;
+            /* Indigo accent on hover */
+            background: #1e293b;
             transform: translateY(-2px);
         }
 
         .upload-area.dragover {
-            border-color: #764ba2;
-            background: #e8ebff;
+            border-color: #818cf8;
+            background: #1e293b;
             transform: scale(1.02);
         }
 
         .upload-icon {
             font-size: 48px;
-            color: #667eea;
+            color: #818cf8;
             margin-bottom: 15px;
         }
 
         .upload-text {
-            color: #666;
+            color: #e5e7eb;
             font-size: 1.1em;
             margin-bottom: 10px;
         }
 
         .upload-hint {
-            color: #999;
+            color: #6b7280;
             font-size: 0.9em;
         }
 
@@ -139,23 +154,29 @@
         }
 
         .status.processing {
-            background: #fff4e6;
-            color: #f59e0b;
-            border: 2px solid #fbbf24;
+            background: #422006;
+            /* Dark orange bg */
+            color: #fdba74;
+            /* Light orange text */
+            border: 1px solid #78350f;
             display: block;
         }
 
         .status.success {
-            background: #d1fae5;
-            color: #059669;
-            border: 2px solid #10b981;
+            background: #064e3b;
+            /* Dark green bg */
+            color: #6ee7b7;
+            /* Light green text */
+            border: 1px solid #065f46;
             display: block;
         }
 
         .status.error {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 2px solid #ef4444;
+            background: #450a0a;
+            /* Dark red bg */
+            color: #fca5a5;
+            /* Light red text */
+            border: 1px solid #7f1d1d;
             display: block;
         }
 
@@ -169,8 +190,8 @@
         }
 
         .chunk {
-            background: #f8f9ff;
-            border: 2px solid #e5e7eb;
+            background: #111827;
+            border: 1px solid #374151;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
@@ -178,8 +199,8 @@
         }
 
         .chunk:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
         }
 
         .chunk-header {
@@ -188,32 +209,52 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 1px solid #374151;
         }
 
         .chunk-title {
             font-weight: 600;
-            color: #333;
+            color: #f3f4f6;
             font-size: 1.1em;
         }
 
         .chunk-info {
-            color: #666;
+            color: #9ca3af;
             font-size: 0.9em;
         }
 
         .chunk-content {
-            background: white;
+            background: #0f172a;
+            /* Code block dark blue/black */
             padding: 15px;
             border-radius: 8px;
+            border: 1px solid #1e293b;
             max-height: 200px;
             overflow-y: auto;
             white-space: pre-wrap;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
-            color: #333;
+            color: #e2e8f0;
             line-height: 1.6;
             margin-bottom: 15px;
+        }
+
+        /* Custom scrollbar for dark mode */
+        .chunk-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chunk-content::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .chunk-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .chunk-content::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
 
         .chunk-actions {
@@ -238,7 +279,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .btn:active {
@@ -246,34 +287,38 @@
         }
 
         .btn-copy {
-            background: #667eea;
+            background: #4f46e5;
+            /* Indigo-600 */
             color: white;
         }
 
         .btn-copy:hover {
-            background: #5568d3;
+            background: #4338ca;
+            /* Indigo-700 */
         }
 
         .btn-download {
-            background: #10b981;
+            background: #059669;
+            /* Emerald-600 */
             color: white;
         }
 
         .btn-download:hover {
-            background: #059669;
+            background: #047857;
+            /* Emerald-700 */
         }
 
         .footer {
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            color: #666;
+            border-top: 1px solid #374151;
+            color: #6b7280;
             font-size: 0.9em;
         }
 
         .footer a {
-            color: #667eea;
+            color: #818cf8;
             text-decoration: none;
             font-weight: 600;
         }
@@ -283,8 +328,8 @@
         }
 
         .spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #667eea;
+            border: 3px solid #374151;
+            border-top: 3px solid #818cf8;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -298,8 +343,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 768px) {
@@ -321,6 +371,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="logo-container">
         <picture>
@@ -349,7 +400,8 @@
         <div class="results" id="results"></div>
 
         <div class="footer">
-            <p>Built with AWS Lambda & S3 | <a href="https://github.com/dave-schmidt-dev/pdf-chunker" target="_blank">View on GitHub</a></p>
+            <p>Built with AWS Lambda & S3 | <a href="https://github.com/dave-schmidt-dev/pdf-chunker"
+                    target="_blank">View on GitHub</a></p>
         </div>
     </div>
 
@@ -413,15 +465,15 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        pdf_data: base64,
+                        pdf: base64,  // Matches lambda_function.py expectation
                         filename: file.name
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.error) {
-                    showStatus('error', data.error);
+                if (data.error || data.success === false) {
+                    showStatus('error', data.error || 'Unknown error occurred');
                 } else {
                     showStatus('success', `Successfully processed! ${data.chunks.length} chunks created`);
                     displayResults(data);
@@ -449,16 +501,20 @@
 
         function displayResults(data) {
             results.innerHTML = '';
-            
-            data.chunks.forEach((chunk, index) => {
+
+            data.chunks.forEach((chunkText, index) => {
                 const chunkDiv = document.createElement('div');
                 chunkDiv.className = 'chunk';
+                // Note: Adjusted slightly since lambda returns list of strings now, not objects
+                // If your API returns objects with character_count, use chunk.character_count
+                const charCount = chunkText.length;
+
                 chunkDiv.innerHTML = `
                     <div class="chunk-header">
                         <div class="chunk-title">Chunk ${index + 1} of ${data.chunks.length}</div>
-                        <div class="chunk-info">${chunk.character_count.toLocaleString()} characters</div>
+                        <div class="chunk-info">${charCount.toLocaleString()} characters</div>
                     </div>
-                    <div class="chunk-content">${chunk.text.substring(0, 500)}${chunk.text.length > 500 ? '...' : ''}</div>
+                    <div class="chunk-content">${chunkText.substring(0, 500)}${chunkText.length > 500 ? '...' : ''}</div>
                     <div class="chunk-actions">
                         <button class="btn btn-copy" onclick="copyToClipboard(${index})">
                             📋 Copy to Clipboard
@@ -476,7 +532,7 @@
         }
 
         function copyToClipboard(index) {
-            const text = window.chunksData[index].text;
+            const text = window.chunksData[index]; // Adjusted for direct string array
             navigator.clipboard.writeText(text).then(() => {
                 showStatus('success', 'Copied to clipboard!');
                 setTimeout(() => {
@@ -488,8 +544,8 @@
         }
 
         function downloadChunk(index) {
-            const chunk = window.chunksData[index];
-            const blob = new Blob([chunk.text], { type: 'text/plain' });
+            const text = window.chunksData[index]; // Adjusted for direct string array
+            const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -498,7 +554,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             showStatus('success', 'Downloaded!');
             setTimeout(() => {
                 status.classList.remove('success');
@@ -506,4 +562,5 @@
         }
     </script>
 </body>
+
 </html>
