@@ -1,5 +1,5 @@
 # Python Dependencies for PDF to Text Chunks Lambda Function
 # Install with: pip install -r requirements.txt
 
-PyPDF2==3.0.1
+pypdf>=3.0.0
 boto3==1.28.0  # AWS SDK (usually pre-installed in Lambda)

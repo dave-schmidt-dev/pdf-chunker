@@ -57,15 +57,17 @@ deploy_lambda() {
     echo -e "${BLUE}Deploying Lambda function...${NC}"
     
     # Check if lambda_function.py exists
-    if [ ! -f "lambda_function.py" ]; then
-        echo -e "${RED}❌ Error: lambda_function.py not found${NC}"
+    if [ ! -f "src/lambda_function.py" ]; then
+        echo -e "${RED}❌ Error: src/lambda_function.py not found${NC}"
         echo -e "${YELLOW}   Make sure you're in the project root directory${NC}"
         exit 1
     fi
     
     # Create deployment package
     echo "📦 Creating deployment package..."
-    zip -q deployment.zip lambda_function.py
+    # Zip lambda_function.py from src, but place it at root of zip
+    # -j (junk paths) will store just the file name, not the path
+    zip -q -j deployment.zip src/lambda_function.py
     
     # Upload to Lambda
     echo "⬆️  Uploading to Lambda..."
@@ -78,6 +80,19 @@ deploy_lambda() {
     # Clean up
     rm deployment.zip
     
+    # Update Function URL config with CORS
+    echo "🔒 Configuring CORS for Function URL..."
+    WEBSITE_URL="https://${WEBSITE_BUCKET}.s3.${REGION}.amazonaws.com"
+    
+    aws lambda update-function-url-config \
+        --function-name $LAMBDA_FUNCTION \
+        --cors "AllowOrigins=[$WEBSITE_URL],AllowMethods=[POST],AllowHeaders=[Content-Type],MaxAge=3600" \
+        --region $REGION \
+        > /dev/null 2>&1 || {
+            echo -e "${YELLOW}⚠️  Warning: Could not configure CORS. You may lack the 'lambda:UpdateFunctionUrlConfig' permission.${NC}"
+            echo -e "${YELLOW}   The function code was updated successfully, but CORS settings were not applied.${NC}"
+        }
+        
     echo -e "${GREEN}✅ Lambda function deployed successfully!${NC}"
     echo ""
 }

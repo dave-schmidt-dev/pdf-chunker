@@ -2,15 +2,18 @@ import json
 import boto3
 import re
 import base64
-from PyPDF2 import PdfReader
+import os
+from pypdf import PdfReader
 from io import BytesIO
 from datetime import datetime, timedelta
 
 s3 = boto3.client('s3')
 
-# Rate limiting: max 10 requests per IP per hour
+# Rate limiting: max requests per IP per hour (local to container)
 request_history = {}
-MAX_REQUESTS_PER_IP = 10
+MAX_REQUESTS_PER_IP = int(os.environ.get('MAX_REQUESTS_PER_IP', '10'))
+CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '20000'))
+OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'my-pdf-output-bucket-dave')
 
 def is_rate_limited(ip_address):
     """Check if this IP has exceeded rate limit"""
@@ -56,7 +59,7 @@ def handle_web_request(event, context):
                 'headers': {'Content-Type': 'application/json'},
                 'body': json.dumps({
                     'success': False,
-                    'error': 'Rate limit exceeded. Maximum 10 requests per hour.'
+                    'error': f'Rate limit exceeded. Maximum {MAX_REQUESTS_PER_IP} requests per hour.'
                 })
             }
         
@@ -68,10 +71,16 @@ def handle_web_request(event, context):
         # If Lambda encoded the whole body as base64, decode it first
         if event.get('isBase64Encoded'):
             print("Decoding base64 body...")
-            body_str = base64.b64decode(body_str).decode('utf-8')
+            try:
+                body_str = base64.b64decode(body_str).decode('utf-8')
+            except Exception as e:
+                raise ValueError(f"Invalid base64 encoded body: {str(e)}")
         
         # Parse as JSON
-        body = json.loads(body_str)
+        try:
+            body = json.loads(body_str)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON body")
         
         pdf_base64 = body.get('pdf', '')
         filename = body.get('filename', 'upload.pdf')
@@ -82,7 +91,11 @@ def handle_web_request(event, context):
         print(f"Processing file: {filename}")
         
         # Decode the PDF from base64
-        pdf_content = base64.b64decode(pdf_base64)
+        try:
+            pdf_content = base64.b64decode(pdf_base64)
+        except Exception as e:
+            raise ValueError(f"Invalid base64 encoded PDF data: {str(e)}")
+
         print(f"Decoded PDF: {len(pdf_content)} bytes")
         
         # Extract text
@@ -96,7 +109,7 @@ def handle_web_request(event, context):
         
         # Split into chunks
         print("Splitting into chunks...")
-        chunks = split_into_chunks(text, chunk_size=20000)
+        chunks = split_into_chunks(text, chunk_size=CHUNK_SIZE)
         print(f"Created {len(chunks)} chunks")
         
         # Return chunks directly to the user
@@ -115,6 +128,16 @@ def handle_web_request(event, context):
             'body': json.dumps(response_body)
         }
         
+    except ValueError as e:
+        print(f"Validation error: {str(e)}")
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({
+                'success': False,
+                'error': str(e)
+            })
+        }
     except Exception as e:
         print(f"Error in web request: {str(e)}")
         import traceback
@@ -127,7 +150,7 @@ def handle_web_request(event, context):
             },
             'body': json.dumps({
                 'success': False,
-                'error': str(e)
+                'error': "Internal server error"
             })
         }
 
@@ -137,8 +160,6 @@ def handle_s3_trigger(event, context):
     key = event['Records'][0]['s3']['object']['key']
     
     print(f"Processing file: {key} from bucket: {bucket}")
-    
-    output_bucket = 'my-pdf-output-bucket-dave'
     
     try:
         # Download PDF from S3
@@ -157,7 +178,7 @@ def handle_s3_trigger(event, context):
         
         # Split into chunks
         print("Splitting into chunks...")
-        chunks = split_into_chunks(text, chunk_size=20000)
+        chunks = split_into_chunks(text, chunk_size=CHUNK_SIZE)
         print(f"Created {len(chunks)} chunks")
         
         # Upload each chunk to S3
@@ -168,7 +189,7 @@ def handle_s3_trigger(event, context):
             chunk_filename = f"{base_name}_part{i}.txt"
             
             s3.put_object(
-                Bucket=output_bucket,
+                Bucket=OUTPUT_BUCKET,
                 Key=chunk_filename,
                 Body=chunk.encode('utf-8'),
                 ContentType='text/plain'
@@ -218,20 +239,34 @@ def clean_text(text):
     return text.strip()
 
 def split_into_chunks(text, chunk_size=20000):
-    """Split text into chunks at paragraph boundaries"""
+    """Split text into chunks with strict size limits"""
     chunks = []
     paragraphs = text.split('\n\n')
     
     current_chunk = ""
     
     for para in paragraphs:
-        if len(current_chunk) + len(para) + 2 > chunk_size:
+        # Check if paragraph itself is too large
+        if len(para) > chunk_size:
+            # If we have a current chunk, add it first
             if current_chunk:
                 chunks.append(current_chunk.strip())
-                current_chunk = para
-            else:
-                chunks.append(para)
+                current_chunk = ""
+            
+            # Split large paragraph
+            sub_chunks = split_large_text(para, chunk_size)
+            
+            # Add all sub-chunks except potentially the last one if it fits in next
+            # But for simplicity, just add them all as separate chunks
+            chunks.extend(sub_chunks)
+            
+        elif len(current_chunk) + len(para) + 2 > chunk_size:
+            # Current chunk full, push it
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+            current_chunk = para
         else:
+            # Add to current chunk
             if current_chunk:
                 current_chunk += "\n\n" + para
             else:
@@ -240,4 +275,37 @@ def split_into_chunks(text, chunk_size=20000):
     if current_chunk:
         chunks.append(current_chunk.strip())
     
+    return chunks
+
+def split_large_text(text, limit):
+    """Helper to split a large block of text into smaller pieces"""
+    chunks = []
+    
+    # First try splitting by sentences
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    current_chunk = ""
+    
+    for sentence in sentences:
+        if len(sentence) > limit:
+            # Sentence itself is too big, hard split
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+                current_chunk = ""
+            
+            # Hard split by characters
+            for i in range(0, len(sentence), limit):
+                chunks.append(sentence[i:i+limit])
+                
+        elif len(current_chunk) + len(sentence) + 1 > limit:
+            chunks.append(current_chunk.strip())
+            current_chunk = sentence
+        else:
+            if current_chunk:
+                current_chunk += " " + sentence
+            else:
+                current_chunk = sentence
+                
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+        
     return chunks
