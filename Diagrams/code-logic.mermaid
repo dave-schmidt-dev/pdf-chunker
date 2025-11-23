@@ -24,7 +24,7 @@ flowchart TD
     CheckPDF -->|Yes| DecodePDF[Decode Base64 PDF]
     DecodePDF --> Process
     
-    Process --> Extract[PyPDF2: Extract Text]
+    Process --> Extract[pypdf: Extract Text]
     Extract --> Clean[Clean Text:<br/>- Remove spaces<br/>- Add breaks<br/>- Format speakers]
     Clean --> Split[Split into 20k Chunks]
     

@@ -6,7 +6,7 @@ graph TD
     D -->|Exceeded| E["❌ 429 Error<br/>Rate limit exceeded"]
     D -->|OK| F["🔓 Decode Base64"]
     
-    F --> G["📖 PyPDF2.PdfReader<br/>Extract text from pages"]
+    F --> G["📖 pypdf.PdfReader<br/>Extract text from pages"]
     G --> H["📝 Raw Text<br/>~50,000 chars"]
     
     H --> I["🧹 Text Cleaning"]

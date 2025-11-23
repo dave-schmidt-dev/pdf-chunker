@@ -3,7 +3,7 @@ sequenceDiagram
     participant Browser
     participant HTML as pdf-chunker.html
     participant Lambda as Lambda Function
-    participant PyPDF2 as PyPDF2 Library
+    participant pypdf as pypdf Library
     
     User->>Browser: Opens website
     Browser->>HTML: Loads from S3
@@ -24,8 +24,8 @@ sequenceDiagram
         HTML->>Browser: Show "Rate limit exceeded"
     else Rate limit OK
         Lambda->>Lambda: Decode Base64
-        Lambda->>PyPDF2: Extract text from PDF
-        PyPDF2->>Lambda: Raw text
+        Lambda->>pypdf: Extract text from PDF
+        pypdf->>Lambda: Raw text
         
         Lambda->>Lambda: Clean formatting
         Lambda->>Lambda: Split into 20k chunks
