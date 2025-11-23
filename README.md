@@ -32,7 +32,7 @@ A serverless application that converts PDF files into text chunks of 20,000 char
 ## 🏗️ Architecture
 
 ```
-User Upload → Lambda Function URL → PyPDF2 Processing
+User Upload → Lambda Function URL → pypdf Processing
      ↓
 Text Extraction → Smart Chunking → JSON Response
      ↓
@@ -40,6 +40,7 @@ Web Interface → Copy/Download
 ```
 
 **Alternative S3 Flow:**
+
 ```
 S3 Upload → Event Trigger → Lambda Processing → Output to S3
 ```
@@ -63,19 +64,21 @@ S3 Upload → Event Trigger → Lambda Processing → Output to S3
 
 - **Backend:** AWS Lambda (Python 3.13)
 - **Storage:** AWS S3
-- **PDF Library:** PyPDF2
+- **PDF Library:** pypdf
 - **Frontend:** Vanilla JavaScript + HTML/CSS
 - **Deployment:** AWS CLI + Bash Scripts
 
 ## 🛠️ Installation & Deployment
 
 See [SETUP.md](SETUP.md) for detailed instructions on:
+
 - AWS account setup
 - Lambda function configuration
 - S3 bucket creation
 - Deployment automation
 
 **Quick Deploy:**
+
 ```bash
 # Clone the repository
 git clone https://github.com/dave-schmidt-dev/pdf-chunker.git
@@ -91,7 +94,7 @@ aws configure
 ## 📊 AWS Resources
 
 - **Lambda Function:** `PDFToTextChunker`
-- **S3 Buckets:** 
+- **S3 Buckets:**
   - `my-pdf-input-bucket-dave` (input)
   - `my-pdf-output-bucket-dave` (output)
   - `my-pdf-chunker-website` (web hosting)
@@ -100,7 +103,7 @@ aws configure
 ## 💡 How It Works
 
 1. **Upload:** PDF sent as Base64 to Lambda Function URL
-2. **Extract:** PyPDF2 extracts text from PDF
+2. **Extract:** pypdf extracts text from PDF
 3. **Clean:** Text formatting improved (paragraphs, speaker names)
 4. **Chunk:** Split into 20k character segments at paragraph boundaries
 5. **Return:** JSON with chunks, character counts, and metadata
@@ -108,12 +111,14 @@ aws configure
 ## 📈 Usage & Costs
 
 **Typical Monthly Usage:**
+
 - Lambda requests: ~12/month
 - S3 storage: ~5MB
 - CloudWatch logs: ~1MB
 - **Total cost: $0.00** (within free tier)
 
 **Free Tier Limits:**
+
 - Lambda: 1M requests/month
 - S3: 5GB storage, 20k requests
 - Data transfer: 1GB/month
@@ -173,9 +178,10 @@ Complete index of all files in this repository with direct access links. All lin
 
 | File | Description | Direct Link |
 |------|-------------|-------------|
-| lambda_function.py | AWS Lambda function (Python 3.13) | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/lambda_function.py) |
+| src/lambda_function.py | AWS Lambda function (Python 3.13) | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/src/lambda_function.py) |
 | pdf-chunker.html | Web interface (HTML/CSS/JS) | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/pdf-chunker.html) |
 | deploy.sh | Automated deployment script | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/deploy.sh) |
+| verify_deployment.py | Smoke test verification script | [View Raw](https://raw.githubusercontent.com/dave-schmidt-dev/pdf-chunker/main/verify_deployment.py) |
 
 ### ⚙️ Configuration Files
 

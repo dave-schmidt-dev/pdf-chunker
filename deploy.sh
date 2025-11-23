@@ -65,9 +65,25 @@ deploy_lambda() {
     
     # Create deployment package
     echo "📦 Creating deployment package..."
-    # Zip lambda_function.py from src, but place it at root of zip
-    # -j (junk paths) will store just the file name, not the path
-    zip -q -j deployment.zip src/lambda_function.py
+    
+    # Create temporary directory for packaging
+    mkdir -p package
+    
+    # Install dependencies
+    echo "   Installing dependencies..."
+    python3 -m pip install -r requirements.txt -t package/ --quiet
+    
+    # Copy lambda function
+    cp src/lambda_function.py package/
+    
+    # Zip everything
+    echo "   Zipping package..."
+    cd package
+    zip -q -r ../deployment.zip .
+    cd ..
+    
+    # Clean up temp directory
+    rm -rf package
     
     # Upload to Lambda
     echo "⬆️  Uploading to Lambda..."
@@ -77,7 +93,7 @@ deploy_lambda() {
         --region $REGION \
         > /dev/null
     
-    # Clean up
+    # Clean up zip
     rm deployment.zip
     
     # Update Function URL config with CORS
