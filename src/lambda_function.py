@@ -13,7 +13,7 @@ s3 = boto3.client('s3')
 request_history = {}
 MAX_REQUESTS_PER_IP = int(os.environ.get('MAX_REQUESTS_PER_IP', '10'))
 CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '20000'))
-OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'my-pdf-output-bucket-dave')
+OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'your-output-bucket')
 
 def is_rate_limited(ip_address):
     """Check if this IP has exceeded rate limit"""

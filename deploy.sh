@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 LAMBDA_FUNCTION="PDFToTextChunker"
-WEBSITE_BUCKET="my-pdf-chunker-website"
+WEBSITE_BUCKET="${WEBSITE_BUCKET:?Set WEBSITE_BUCKET in your environment}"
 REGION="us-east-2"
 
 # Determine what to deploy

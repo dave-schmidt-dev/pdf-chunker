@@ -411,7 +411,8 @@
         const status = document.getElementById('status');
         const results = document.getElementById('results');
         const spinner = document.getElementById('spinner');
-        const lambdaUrl = 'https://6utxwfiwqyll6dtneyd54vcei40xfkmq.lambda-url.us-east-2.on.aws/';
+        // Configure your Lambda endpoint URL here
+        const LAMBDA_URL = 'YOUR_LAMBDA_URL_HERE';
 
         // Click to upload
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -459,7 +460,7 @@
 
             try {
                 const base64 = await fileToBase64(file);
-                const response = await fetch(lambdaUrl, {
+                const response = await fetch(LAMBDA_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
